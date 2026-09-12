@@ -1,3 +1,3 @@
-export default function logo(){
+export default function Logo(){
     return <p>Nutrila</p>
 }

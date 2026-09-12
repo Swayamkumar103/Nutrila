@@ -1,3 +1,3 @@
-export default function userProfile({userName}){
+export default function UserProfile({userName}){
     return <p>{userName}</p>
 }
