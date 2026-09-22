@@ -1,53 +1,59 @@
 "use client";
 import Link from "next/link";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 export default function Register() {
+  const route = useRouter();
   const [formData, setFormData] = useState({
-        name: "",
-        email: "",
-        password : "",
-        confirmPassword: "",
-  })
- const handleChange = (e) => {
-  setFormData({
-    ...formData,
-    [e.target.name]: e.target.value,
+    name: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
   });
-};
-  const handleSubmit = async (e)=>{
+  const [loading, setLoading] = useState(false);
+  const [message, setmessage] = useState("");
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
+  };
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if(formData.password !==formData.confirmPassword){
+    if (formData.password !== formData.confirmPassword) {
       alert("Password do not match");
       return;
     }
-      try{
-        const response = await fetch("/api/auth/register",{
-          method : "POST",
-          headers:{
-            "Content-Type" : "application/json",
-          },
-          body: JSON.stringify({
-            name : formData.name,
-            email : formData.email,
-            password : formData.password,
-          }),
-        });
-        const data = await response.json();
-        // const text = await response.text();
-        // console.log("Status:", response.status);
-        // console.log("Response:", text);
-        if(response.ok){
-          console.log(data);
-          alert("Account created successfully");
-        } else{
-          alert(data.message);
-        }
-      } catch(error){
-        console.error(error);
-        alert("Something went wrong");
+    setLoading(true);
+    try {
+      const response = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          password: formData.password,
+        }),
+      });
+      const data = await response.json();
+      if (response.ok) {
+        console.log(data);
+        setmessage("Account created successfully");
+        setTimeout(()=>{
+          route.push("/login");
+        },1500)
+      } else {
+        alert(data.message);
       }
-    
-  }
+    } catch (error) {
+      console.error(error);
+      alert("Something went wrong");
+    } finally {
+      setLoading(false);
+    }
+  };
   return (
     <div className="min-h-screen bg-[#F4F8F2] flex items-center justify-center px-4 py-10">
       <div className="w-full max-w-5xl bg-white rounded-[28px] shadow-[0_10px_40px_rgba(30,70,50,0.08)] overflow-hidden grid md:grid-cols-2">
@@ -167,7 +173,7 @@ export default function Register() {
                 <input
                   type="password"
                   name="password"
-                  value = {formData.password}
+                  value={formData.password}
                   onChange={handleChange}
                   placeholder="Create a password"
                   className="
@@ -194,9 +200,9 @@ export default function Register() {
 
                 <input
                   type="password"
-                  name = "confirmPassword"
-                  value = {formData.confirmPassword}
-                  onChange = {handleChange}
+                  name="confirmPassword"
+                  value={formData.confirmPassword}
+                  onChange={handleChange}
                   placeholder="Confirm your password"
                   className="
                     w-full px-4 py-3.5
@@ -240,21 +246,38 @@ export default function Register() {
               {/* Button */}
               <button
                 type="submit"
-                className="
-                w-full
-                bg-[#1E9E5A]
-                hover:bg-[#18894D]
-                text-white
-                font-semibold
-                py-3.5
-                rounded-xl
-                transition
-                duration-200
-                shadow-sm"
+                disabled={loading}
+                className="w-full 
+                rounded-xl 
+                bg-[#1E9E5A] 
+                py-3 font-semibold 
+                text-white transition 
+                hover:bg-[#18894D] 
+                disabled:cursor-not-allowed 
+                disabled:opacity-70"
               >
-                Create Account
+                {loading ? (
+                  <span className="flex items-center justify-center gap-2">
+                    <span className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent"></span>
+                    Creating Account...
+                  </span>
+                ) : (
+                  "Create Account"
+                )}
               </button>
             </form>
+
+            {/*Toast Message*/}
+            {message &&(
+              <div className="fixed right-5 top-5 z-50 flex items-center gap-3 rounded-xl bg-white px-5 py-4 shadow-lg border border-[#DCE8DA]">
+                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#EAF5E8] text-[#1E9E5A]">
+                ✓
+                </div>
+                <p className="font-medium text-[#102B23]">
+                  {message}
+                </p>
+              </div>
+            )}
 
             {/* Login */}
             <p className="text-center text-sm text-[#687D79] mt-7">

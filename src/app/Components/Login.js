@@ -1,6 +1,54 @@
+"use client"
 import Link from "next/link";
-
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 export default function Login() {
+  const [formData,setFormData] = useState(
+    {
+      email:"",
+      password:"",
+    }
+  )
+  const route = useRouter();
+  const handleChange = (e)=>{
+    setFormData({
+      ...formData,
+      [e.target.name]:e.target.value,
+    });
+  };
+  const handleSubmit = async (e)=>{
+    e.preventDefault();
+    
+    if(!formData.email || !formData.password){
+      alert("Please enter email and password")
+      return;
+    }
+    try{
+      const response = await fetch("api/auth/login",{
+        method:"POST",
+        headers:{
+          "Content-Type" : "applicaton/json", 
+        },
+        body:JSON.stringify({
+          email:formData.email,
+          password: formData.password,
+        }),
+      });
+      const data = await response.json();
+      if(response.ok){
+        console.log(data);
+        alert("Login Successful");
+        setTimeout(()=>{
+          route.push("/dashboard");
+        },1000);
+      } else{
+        alert(data.message);
+      }
+    } catch(error){
+      console.error("Login error: ",error);
+      alert("Something went wrong");
+    }
+  }
   return (
     <div className="min-h-screen bg-[#F4F8F2] flex items-center justify-center px-4 py-10">
 
@@ -68,7 +116,7 @@ export default function Login() {
             </p>
 
 
-            <form className="mt-8 space-y-5">
+            <form className="mt-8 space-y-5" onSubmit={handleSubmit}>
 
               {/* Email */}
               <div>
@@ -80,6 +128,9 @@ export default function Login() {
                 <input
                   type="email"
                   placeholder="you@example.com"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
                   className="
                     w-full
                     px-4
@@ -122,6 +173,9 @@ export default function Login() {
                 <input
                   type="password"
                   placeholder="Enter your password"
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
                   className="
                     w-full
                     px-4
