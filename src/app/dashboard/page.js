@@ -3,5 +3,5 @@ import { getCurrentUser } from "@/lib/auth";
 
 export default async function DashboardPage() {
   const user = await getCurrentUser();
-  return <Dashboard expiresAt={user.exp} />;
+  return <Dashboard expiresAt={user.exp} userName={user.name} />;
 }

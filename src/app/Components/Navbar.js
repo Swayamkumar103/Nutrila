@@ -1,7 +1,7 @@
 import Logo from "./Logo";
 import UserProfile from "./userProfile";
 
-export default function Navbar({ userName = "Swayam" }) {
+export default function Navbar({ userName}) {
   return (
     <nav className="sticky top-0 z-20 border-b border-[#dfeadf] bg-[#f7faf5]/90 backdrop-blur-sm">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">

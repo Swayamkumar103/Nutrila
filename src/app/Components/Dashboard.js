@@ -52,7 +52,7 @@ const mealIcons = {
   Snack: "🍎",
 };
 
-export default function Dashboard({ expiresAt, initialShowAddMeal = false }) {
+export default function Dashboard({ userName, expiresAt, initialShowAddMeal = false }) {
   const [showAddMeal, setShowAddMeal] = useState(initialShowAddMeal);
   const [meals, setMeals] = useState(initialMeals);
   const [editingMealId, setEditingMealId] = useState(null);
@@ -89,11 +89,12 @@ export default function Dashboard({ expiresAt, initialShowAddMeal = false }) {
       currentMeals.filter((meal) => meal.id !== mealId),
     );
   };
+  
 
   return (
     <div className="min-h-screen bg-[#f3f7f1] text-[#1f2d1f]">
       <SessionExpiryRedirect expiresAt={expiresAt} />
-      <Navbar userName="Swayam" />
+      <Navbar userName= {userName} />
 
       <main className="mx-auto max-w-6xl px-4 pb-12 pt-8 sm:px-6 lg:px-8">
         <Greet user="Swayam" />
