@@ -1,15 +1,98 @@
+"use client"
 import Calories from "./Calories";
 import DailyGoal from "./DailyGoal";
 import Greet from "./greet";
 import MacroCard from "./MacroCard";
 import MealCard from "./MealCard";
 import Navbar from "./Navbar";
+import SessionExpiryRedirect from "./SessionExpiryRedirect";
+import AddMeal from "./Addmeal";
+import { useState } from "react";
 
 const weekData = [1800, 2200, 2100, 2400, 2200, 2700, 2300];
+const initialMeals = [
+  {
+    id: "breakfast",
+    mealType: "Breakfast",
+    foodName: "Oatmeal, banana & eggs",
+    calories: 420,
+    protein: 24,
+    carbs: 48,
+    fat: 14,
+    time: "8:30 AM",
+    icon: "🍳",
+  },
+  {
+    id: "lunch",
+    mealType: "Lunch",
+    foodName: "Chicken, rice & vegetables",
+    calories: 580,
+    protein: 42,
+    carbs: 65,
+    fat: 18,
+    time: "1:15 PM",
+    icon: "🥗",
+  },
+  {
+    id: "snack",
+    mealType: "Snack",
+    foodName: "Apple & almonds",
+    calories: 180,
+    protein: 5,
+    carbs: 22,
+    fat: 8,
+    time: "4:30 PM",
+    icon: "🍎",
+  },
+];
+const mealIcons = {
+  Breakfast: "🌅",
+  Lunch: "🥗",
+  Dinner: "🍲",
+  Snack: "🍎",
+};
 
-export default function Dashboard() {
+export default function Dashboard({ expiresAt, initialShowAddMeal = false }) {
+  const [showAddMeal, setShowAddMeal] = useState(initialShowAddMeal);
+  const [meals, setMeals] = useState(initialMeals);
+  const [editingMealId, setEditingMealId] = useState(null);
+
+  const handleAddMeal = (meal) => {
+    setMeals((currentMeals) => {
+      if (editingMealId !== null) {
+        return currentMeals.map((currentMeal) =>
+          currentMeal.id === editingMealId
+            ? {
+                ...currentMeal,
+                ...meal,
+                icon: mealIcons[meal.mealType],
+              }
+            : currentMeal,
+        );
+      }
+
+      return [
+        ...currentMeals,
+        {
+          id: crypto.randomUUID(),
+          ...meal,
+          icon: mealIcons[meal.mealType],
+        },
+      ];
+    });
+    setEditingMealId(null);
+    setShowAddMeal(false);
+  };
+
+  const handleDeleteMeal = (mealId) => {
+    setMeals((currentMeals) =>
+      currentMeals.filter((meal) => meal.id !== mealId),
+    );
+  };
+
   return (
     <div className="min-h-screen bg-[#f3f7f1] text-[#1f2d1f]">
+      <SessionExpiryRedirect expiresAt={expiresAt} />
       <Navbar userName="Swayam" />
 
       <main className="mx-auto max-w-6xl px-4 pb-12 pt-8 sm:px-6 lg:px-8">
@@ -28,33 +111,63 @@ export default function Dashboard() {
 
         <section className="mt-10 rounded-[28px] border border-[#e6eee6] bg-white p-5 shadow-[0_8px_25px_rgba(24,39,24,0.04)] sm:p-6">
           <div className="mb-4 flex items-center justify-between">
-            <h2 className="text-2xl font-semibold tracking-tight text-[#1f2d1f]">Today's Meals</h2>
-            <button className="rounded-full bg-[#1d7a45] px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-[#18673d]">
+            <h2 className="text-2xl font-semibold tracking-tight text-[#1f2d1f]">
+              Today&apos;s Meals
+            </h2>
+            <button
+              onClick={() => {
+                setEditingMealId(null);
+                setShowAddMeal(true);
+              }}
+              className="rounded-full bg-[#1d7a45] px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-[#18673d]"
+            >
               + Add Meal
             </button>
+            {showAddMeal && (
+              <AddMeal
+                onClose={() => setShowAddMeal(false)}
+                onAdd={handleAddMeal}
+                initialMeal={
+                  meals.find((meal) => meal.id === editingMealId) ?? null
+                }
+              />
+            )}
           </div>
 
           <div className="overflow-hidden rounded-[20px] border border-[#edf3ee] bg-[#fbfcfb]">
-            <MealCard mealType="Breakfast" mealName="Oatmeal, banana & eggs" calories={420} protein={24} carbs={48} fat={14} time="8:30 AM" icon="🍳" />
-            <MealCard mealType="Lunch" mealName="Chicken, rice & vegetables" calories={580} protein={42} carbs={65} fat={18} time="1:15 PM" icon="🥗" />
-            <MealCard mealType="Snack" mealName="Apple & almonds" calories={180} protein={5} carbs={22} fat={8} time="4:30 PM" icon="🍎" />
+            {meals.map((meal, index) => (
+              <MealCard
+                key={meal.id}
+                {...meal}
+                onEdit={() => {
+                  setEditingMealId(meal.id);
+                  setShowAddMeal(true);
+                }}
+                onDelete={() => handleDeleteMeal(meal.id)}
+              />
+            ))}
           </div>
         </section>
 
         <section className="mt-10 rounded-[28px] border border-[#e6eee6] bg-white p-5 shadow-[0_8px_25px_rgba(24,39,24,0.04)] sm:p-6">
-          <h2 className="mb-6 text-2xl font-semibold tracking-tight text-[#1f2d1f]">Weekly Calories</h2>
+          <h2 className="mb-6 text-2xl font-semibold tracking-tight text-[#1f2d1f]">
+            Weekly Calories
+          </h2>
 
           <div className="flex h-44 items-end justify-between gap-3 rounded-[20px] bg-[#fbfcfb] px-4 pb-4 pt-6">
             {weekData.map((value, index) => (
-              <div key={index} className="flex flex-1 flex-col items-center gap-3">
+              <div
+                key={index}
+                className="flex flex-1 flex-col items-center gap-3"
+              >
                 <div className="flex h-28 w-full items-end justify-center">
                   <div
-                    className="w-full rounded-t-xl bg-gradient-to-t from-[#7ecb78] to-[#bfeab5]"
+                    className="w-full rounded-t-xl bg-linear-to-t from-[#7ecb78] to-[#bfeab5]"
                     style={{ height: `${(value / 3000) * 100}%` }}
                   />
                 </div>
                 <span className="text-xs font-medium text-[#607060]">
-                  {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'][index]}
+                  {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"][index]}
                 </span>
               </div>
             ))}

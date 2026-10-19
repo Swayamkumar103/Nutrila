@@ -49,7 +49,7 @@ export async function POST(request) {
             },
             process.env.JWT_SECRET,
             {
-                expiresIn: "7d"
+                expiresIn: "1d"
             }
         );
 
@@ -71,8 +71,8 @@ export async function POST(request) {
             httpOnly: true,
             secure: process.env.NODE_ENV === "production",
             sameSite: "lax",
-            path: "/",
-            maxAge: 60 * 60 * 24 * 7,
+            path: "/dashboard",
+            maxAge: 60*60*24,
         });
 
         return response;

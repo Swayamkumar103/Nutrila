@@ -1,5 +1,7 @@
 import Dashboard from "./Components/Dashboard";
+import { getCurrentUser } from "@/lib/auth";
 
-export default function Home() {
-  return <Dashboard />;
+export default async function Home() {
+  const user = await getCurrentUser();
+  return <Dashboard expiresAt={user.exp} />;
 }
