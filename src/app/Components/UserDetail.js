@@ -195,6 +195,7 @@ export default function UserDetail() {
               <option value="lightly_active">
                 Lightly Active — Exercise 1–3 days/week
               </option>
+              
               <option value="moderately_active">
                 Moderately Active — Exercise 3–5 days/week
               </option>
