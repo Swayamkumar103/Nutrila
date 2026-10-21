@@ -39,7 +39,7 @@ export default function Login() {
         console.log(data);
         alert("Login Successful");
         setTimeout(()=>{
-          route.push("/dashboard");
+          route.push("/userdetail");
         },1000);
       } else{
         alert(data.message);

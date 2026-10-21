@@ -2,7 +2,8 @@ import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import jwt from "jsonwebtoken";
 import connectDB from "@/lib/mongodb";
-import UserDetail from "@/models/UserDetail";
+// import UserDetail from "@/models/UserDetail";
+import UserDetail from "@/module/UserDetail";
 
 const activityMultipliers = {
   sedentary: 1.2,
@@ -138,6 +139,8 @@ export async function POST(request) {
           height: parsedHeight,
           weight: parsedWeight,
           activityLevel: normalizedActivity,
+          bmr: bmr,
+          maintenanceCalories: maintenanceCalories,
         },
       },
       {

@@ -47,6 +47,14 @@ const UserDetailSchema = new mongoose.Schema(
         "extra_active",
       ],
     },
+    bmr : {
+      type : Number,
+      required : true
+    },
+    maintenanceCalories:{
+      type : Number,
+      required : true,
+    },
   },
   {
     timestamps: true,

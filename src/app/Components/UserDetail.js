@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function UserDetail() {
   const [formData, setFormData] = useState({
@@ -14,6 +15,7 @@ export default function UserDetail() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const router = useRouter();
 
   function handleChange(e) {
     const { name, value } = e.target;
@@ -30,6 +32,16 @@ export default function UserDetail() {
     setLoading(true);
     setMessage("");
     setError("");
+    if (
+      !formData.age ||
+      !formData.gender ||
+      !formData.height ||
+      !formData.weight ||
+      !formData.activityLevel
+    ) {
+      setError("Please fill in all fields before continuing.");
+      return;
+    }
 
     try {
       const response = await fetch("/api/user-detail", {
@@ -50,12 +62,11 @@ export default function UserDetail() {
       const result = await response.json();
 
       if (!response.ok) {
-        throw new Error(
-          result.message || "Failed to save user details"
-        );
+        throw new Error(result.message || "Failed to save user details");
       }
 
       setMessage("Your details have been saved successfully!");
+      router.push("/dashboard");
 
       console.log("Saved user details:", result.data);
     } catch (err) {
@@ -68,9 +79,7 @@ export default function UserDetail() {
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-5">
       <div className="w-full max-w-xl bg-white rounded-2xl shadow-lg p-8">
-        <h1 className="text-3xl font-bold text-gray-800">
-          Personal Details
-        </h1>
+        <h1 className="text-3xl font-bold text-gray-800">Personal Details</h1>
 
         <p className="text-gray-500 mt-2 mb-8">
           Tell us about yourself to personalize your nutrition plan.
@@ -195,7 +204,6 @@ export default function UserDetail() {
               <option value="lightly_active">
                 Lightly Active — Exercise 1–3 days/week
               </option>
-              
               <option value="moderately_active">
                 Moderately Active — Exercise 3–5 days/week
               </option>
@@ -210,17 +218,11 @@ export default function UserDetail() {
 
           {/* Success Message */}
           {message && (
-            <p className="text-green-600 text-sm font-medium">
-              {message}
-            </p>
+            <p className="text-green-600 text-sm font-medium">{message}</p>
           )}
 
           {/* Error Message */}
-          {error && (
-            <p className="text-red-600 text-sm font-medium">
-              {error}
-            </p>
-          )}
+          {error && <p className="text-red-600 text-sm font-medium">{error}</p>}
 
           {/* Submit Button */}
           <button
